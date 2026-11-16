@@ -1,0 +1,501 @@
+/* Styles partagés des écrans. Aucune valeur de couleur ou de taille en dur :
+   tout vient de tokens.css (règle 1). */
+
+*, *::before, *::after { box-sizing: border-box; }
+
+/* Un champ qui reçoit le focus ne passe pas sous la barre d'action collée en bas. */
+html { scroll-padding-bottom: calc(var(--control-height) * 3); }
+/* Place de la barre de défilement toujours réservée : la colonne ne se décale pas de 8px
+   entre un écran court (sans barre) et un écran long (avec). */
+html { scrollbar-gutter: stable; }
+
+body {
+    margin: 0;
+    font-family: var(--font-family);
+    font-size: var(--font-size-body-1);
+    line-height: var(--line-height-body-1);
+    font-weight: var(--font-weight-light);
+    color: var(--color-text);
+    background: var(--color-bg);
+    -webkit-font-smoothing: antialiased;
+}
+
+h1, h2, h3, p, ul, ol, dl, dd, fieldset { margin: 0; padding: 0; }
+fieldset { border: 0; min-width: 0; }
+legend { padding: 0; }
+ul, ol { list-style: none; }
+/* Titres équilibrés sur leurs lignes (pas un mot seul en dernière ligne) ; paragraphes sans veuve. */
+h1, h2, h3, legend { text-wrap: balance; }
+p, li { text-wrap: pretty; }
+button, input, select { font: inherit; color: inherit; }
+
+/* Surfaces du navigateur aux couleurs du flow : sélection de texte et curseur de saisie. */
+::selection { background: var(--color-accent); color: var(--color-on-accent); }
+input { caret-color: var(--color-accent); }
+
+:focus-visible {
+    outline: var(--focus-width) solid var(--color-focus);
+    outline-offset: var(--focus-offset);
+}
+.screen__title:focus { outline: none; }
+
+.visually-hidden {
+    position: absolute; width: 1px; height: 1px; margin: -1px;
+    overflow: hidden; clip-path: inset(50%); white-space: nowrap;
+}
+
+/* ---------- Cadre d'écran ---------- */
+
+.screen { min-height: 100dvh; display: flex; flex-direction: column; }
+
+.topbar { border-bottom: var(--border-width-1) solid var(--color-border); }
+.topbar__inner,
+.screen__content,
+.actionbar__inner {
+    width: 100%;
+    max-width: var(--layout-max-width);
+    margin-inline: auto;
+    padding-inline: var(--space-4);
+}
+
+.topbar__inner {
+    display: flex; align-items: center; justify-content: space-between;
+    min-height: var(--control-height); /* = hauteur du bouton Retour : même en-tête avec ou sans lui */
+}
+
+.logo { display: inline-flex; align-items: center; font-weight: var(--font-weight-bold); }
+/* Hauteur fixée, largeur déduite du viewBox (124 × 32). */
+.logo svg { display: block; height: var(--logo-height); width: auto; }
+/* Toutes les couleurs du logo sont des tokens : il suit le thème et un rebranding. */
+.logo__mark, .logo__wordmark { fill: var(--color-text); }
+.logo__accent { fill: var(--color-accent); }
+.logo__wordmark { font-family: var(--font-family); font-weight: var(--font-weight-bold); }
+.logo__text { font-size: var(--font-size-body-2); line-height: var(--line-height-body-2); }
+
+.screen__content {
+    flex: 1;
+    display: flex; flex-direction: column; gap: var(--space-5);
+    padding-block: var(--space-6) var(--space-7);
+}
+
+.screen__title {
+    font-size: var(--font-size-headline-2);
+    line-height: var(--line-height-headline-2);
+    font-weight: var(--font-weight-bold);
+}
+.screen__intro { color: var(--color-text-muted); }
+
+.progress { display: flex; flex-direction: column; gap: var(--space-2); }
+.progress__label {
+    font-size: var(--font-size-label-1); line-height: var(--line-height-label-1);
+    color: var(--color-text-muted); font-weight: var(--font-weight-medium);
+}
+.progress__track { display: grid; grid-auto-flow: column; gap: var(--space-1); }
+.progress__bar { height: var(--space-1); background: var(--color-border); }
+.progress__bar.is-done { background: var(--color-accent); }
+
+/* Barre d'action : collée en bas sur mobile pour garder « Continuer » sous le pouce. */
+.actionbar {
+    position: sticky; bottom: 0; z-index: var(--z-sticky);
+    background: var(--color-bg);
+    border-top: var(--border-width-1) solid var(--color-border);
+}
+.actionbar__inner {
+    display: flex; flex-direction: column; gap: var(--space-3);
+    padding-block: var(--space-4);
+}
+@media (min-width: 768px) {
+    /* Même hauteur de barre sur tous les écrans : celle de l'écran Formules, dont le
+       total empile libellé + montant + mention. Le bouton ne bouge pas d'une étape à l'autre. */
+    .actionbar__inner {
+        flex-direction: row; align-items: center; justify-content: flex-end;
+        min-height: calc(var(--line-height-label-1) + var(--line-height-headline-3)
+            + var(--line-height-body-2) + 2 * var(--space-4));
+    }
+}
+
+/* Indicateur d'étapes masqué mais présent (landing, paiement) : il garde sa place,
+   le titre est à la même hauteur sur les 6 écrans. */
+.progress--placeholder { visibility: hidden; }
+
+/* ---------- Boutons ---------- */
+
+.btn {
+    position: relative;
+    display: inline-flex; align-items: center; justify-content: center;
+    min-height: var(--control-height);
+    padding-inline: var(--space-5);
+    border: 0; border-radius: var(--radius-1);
+    font-weight: var(--font-weight-medium);
+    cursor: pointer;
+    transition: background-color var(--duration-1), box-shadow var(--duration-1), transform var(--duration-1) ease-out;
+}
+/* Retour tactile : le bouton s'enfonce légèrement à l'appui. */
+.btn:active:not(:disabled) { transform: scale(var(--press-scale)); }
+.btn--primary { background: var(--color-accent); color: var(--color-on-accent); }
+.btn--primary:hover:not(:disabled) { background: var(--color-accent-hover); }
+.btn--secondary {
+    background: transparent; color: var(--color-text);
+    box-shadow: inset 0 0 0 var(--border-width-1) var(--color-border-strong);
+}
+.btn--secondary:hover { box-shadow: inset 0 0 0 var(--border-width-2) var(--color-text); }
+.btn:disabled { opacity: var(--opacity-disabled); cursor: not-allowed; }
+.btn.is-loading { opacity: 1; cursor: progress; }
+.btn.is-loading .btn__label { visibility: hidden; }
+
+.spinner {
+    display: none;
+    position: absolute;
+    width: var(--icon-size); height: var(--icon-size);
+    border: var(--border-width-2) solid currentColor;
+    border-right-color: transparent;
+    border-radius: var(--radius-round);
+    animation: spin var(--duration-2) linear infinite;
+}
+.is-loading .spinner, .spinner.is-visible { display: block; }
+@keyframes spin { to { transform: rotate(1turn); } }
+
+.btn-link {
+    background: none; border: 0; padding: 0;
+    color: var(--color-text);
+    text-decoration: underline; text-underline-offset: var(--space-1);
+    cursor: pointer;
+    min-height: var(--control-height);
+}
+.btn-link:hover { text-decoration-thickness: var(--border-width-2); }
+
+/* Retour : lien isolé dans l'en-tête, reconnu par sa place et sa flèche ; pas de soulignement
+   au repos (les liens dans le texte, eux, restent soulignés : c'est leur seul signal). */
+.topbar__back {
+    display: inline-flex; align-items: center; gap: var(--space-1);
+    text-decoration: none;
+}
+.topbar__back:hover { text-decoration: underline; }
+.topbar__back-icon { width: var(--icon-size); height: var(--icon-size); flex: none; }
+
+@media (min-width: 768px) {
+    .btn { min-width: calc(var(--control-height) * 4); }
+}
+
+/* ---------- Formulaires ---------- */
+
+.form { display: flex; flex-direction: column; gap: var(--space-5); }
+
+.field { display: flex; flex-direction: column; gap: var(--space-2); }
+.field__label { font-weight: var(--font-weight-medium); }
+/* Une <legend> n'est pas un élément flex de son fieldset : le `gap` ne s'applique pas
+   à elle. On lui donne le même écart qu'un <label> au-dessus de son champ. */
+.field > legend { margin-bottom: var(--space-2); }
+.field__hint {
+    font-size: var(--font-size-body-2); line-height: var(--line-height-body-2);
+    color: var(--color-text-muted);
+}
+.field__control {
+    min-height: var(--control-height);
+    padding-inline: var(--space-3);
+    background: var(--color-bg);
+    border: 0; border-radius: var(--radius-1);
+    box-shadow: inset 0 0 0 var(--border-width-1) var(--color-border-strong);
+}
+.field__control:hover { box-shadow: inset 0 0 0 var(--border-width-1) var(--color-text); }
+.field__control[aria-invalid="true"] { box-shadow: inset 0 0 0 var(--border-width-2) var(--color-error); }
+.field__error {
+    font-size: var(--font-size-body-2); line-height: var(--line-height-body-2);
+    color: var(--color-error);
+    min-height: var(--line-height-body-2); /* place réservée : rien ne saute (règle 7) */
+}
+
+.field-row { display: grid; gap: var(--space-5); }
+@media (min-width: 768px) { .field-row { grid-template-columns: 1fr 1fr; } }
+/* Les deux champs d'une ligne ont la même hauteur (grille) ; le contrôle est poussé
+   en bas, donc les cases restent alignées même si une aide fait 2 lignes ou manque. */
+.field-row .field__control, .field-row .select { margin-top: auto; }
+/* Prix de la configuration : ligne de total en pied du panneau Véhicule.
+   Filet décoratif (--color-border) ; montant à la taille du Total des formules. */
+.order-total {
+    display: flex; align-items: baseline; justify-content: space-between; gap: var(--space-4);
+    padding-block-start: var(--space-4);
+    border-top: var(--border-width-1) solid var(--color-border);
+}
+.order-total__amount {
+    font-size: var(--font-size-headline-3); line-height: var(--line-height-headline-3);
+    font-weight: var(--font-weight-bold);
+    font-variant-numeric: tabular-nums;
+    white-space: nowrap;
+}
+
+/* Liste déroulante : la flèche native est collée au bord (~4px) et le padding ne la
+   déplace pas. On la masque et on redessine la même petite flèche à --space-3 du bord,
+   comme l'icône calendrier des champs date. Le SVG est un masque : la couleur vient de
+   currentColor, aucune couleur n'est écrite dans le fichier. */
+.select { position: relative; display: grid; }
+.select > select {
+    appearance: none;
+    padding-inline-end: calc(var(--space-3) * 2 + var(--space-3));
+}
+.select::after {
+    content: "";
+    position: absolute; inset-inline-end: var(--space-3); top: 50%;
+    width: var(--space-3); height: var(--space-3);
+    transform: translateY(-50%);
+    background: currentColor;
+    mask: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 12 12'%3E%3Cpath d='M2 4.5l4 4 4-4' fill='none' stroke='black' stroke-width='1.5'/%3E%3C/svg%3E") center / contain no-repeat;
+    pointer-events: none;
+}
+
+/* Choix en pastilles (stationnement, recharge, fréquence) */
+.choices { display: flex; flex-wrap: wrap; gap: var(--space-2); }
+.choice { position: relative; }
+.choice input { position: absolute; opacity: 0; inset: 0; margin: 0; cursor: pointer; }
+.choice span {
+    display: inline-flex; align-items: center;
+    min-height: var(--control-height);
+    padding-inline: var(--space-4);
+    border-radius: var(--radius-1);
+    box-shadow: inset 0 0 0 var(--border-width-1) var(--color-border-strong);
+}
+.choice input:hover + span { box-shadow: inset 0 0 0 var(--border-width-1) var(--color-text); }
+/* Sélectionné : seul le contour change (box-shadow, ne change pas la taille). Plus de passage
+   en gras : un texte plus gras est plus large, la pastille s'élargissait et poussait ses voisines. */
+.choice input:checked + span {
+    box-shadow: inset 0 0 0 var(--border-width-2) var(--color-accent);
+}
+/* Un double-clic ne sélectionne plus le texte de la pastille. */
+.choice span { user-select: none; }
+.choice input:focus-visible + span {
+    outline: var(--focus-width) solid var(--color-focus);
+    outline-offset: var(--focus-offset);
+}
+
+/* Accords du récap : cases rapprochées entre elles (12px), plus loin de leur titre (16px). */
+.consents { display: flex; flex-direction: column; gap: var(--space-3); }
+.consents > legend { margin-bottom: var(--space-4); }
+
+.check { display: flex; gap: var(--space-3); align-items: flex-start; cursor: pointer; }
+.check input {
+    flex: none;
+    width: var(--icon-size); height: var(--icon-size);
+    margin: var(--space-1) 0 0;
+    accent-color: var(--color-accent);
+}
+
+/* ---------- Surfaces ---------- */
+
+.panel {
+    background: var(--color-surface);
+    border-radius: var(--radius-1);
+    padding: var(--space-5);
+    display: flex; flex-direction: column; gap: var(--space-4);
+}
+.panel__title {
+    font-size: var(--font-size-headline-3); line-height: var(--line-height-headline-3);
+    font-weight: var(--font-weight-medium);
+}
+
+.notice {
+    display: flex; flex-direction: column; gap: var(--space-3); align-items: flex-start;
+    padding: var(--space-5);
+    border-radius: var(--radius-1);
+    background: var(--color-surface);
+    /* Contour complet, comme un champ invalide (plus de barre colorée à gauche seulement). */
+    box-shadow: inset 0 0 0 var(--border-width-1) var(--color-error);
+}
+.notice__title { font-size: var(--font-size-body-1); font-weight: var(--font-weight-bold); }
+
+.text-muted { color: var(--color-text-muted); }
+.label {
+    font-size: var(--font-size-label-1); line-height: var(--line-height-label-1);
+    font-weight: var(--font-weight-medium);
+    text-transform: uppercase;
+    color: var(--color-text-muted);
+}
+
+/* ---------- Landing ---------- */
+
+.hero { display: flex; flex-direction: column; gap: var(--space-4); }
+.hero__title {
+    font-size: var(--font-size-headline-1); line-height: var(--line-height-headline-1);
+    font-weight: var(--font-weight-light);
+}
+.hero__price { font-size: var(--font-size-headline-3); line-height: var(--line-height-headline-3); }
+.hero__price strong { font-weight: var(--font-weight-bold); }
+
+.coverage { display: grid; gap: var(--space-3); }
+@media (min-width: 768px) { .coverage { grid-template-columns: 1fr 1fr; } }
+.coverage li { display: flex; gap: var(--space-3); align-items: center; }
+.coverage li::before {
+    content: "";
+    flex: none;
+    width: var(--space-2); height: var(--space-2);
+    background: var(--color-accent);
+}
+
+/* ---------- Formules ---------- */
+
+.packages { display: grid; gap: var(--space-3); }
+@media (min-width: 768px) { .packages { grid-template-columns: repeat(3, 1fr); } }
+
+.package { position: relative; }
+.package input { position: absolute; opacity: 0; inset: 0; margin: 0; cursor: pointer; }
+.package__card {
+    height: 100%;
+    display: flex; flex-direction: column; gap: var(--space-3);
+    padding: var(--space-5);
+    border-radius: var(--radius-1);
+    background: var(--color-bg);
+    box-shadow: inset 0 0 0 var(--border-width-1) var(--color-border-strong);
+    transition: box-shadow var(--duration-1);
+}
+.package input:hover + .package__card {
+    box-shadow: inset 0 0 0 var(--border-width-1) var(--color-text), var(--shadow-card-hover);
+}
+.package input:checked + .package__card {
+    box-shadow: inset 0 0 0 var(--border-width-2) var(--color-accent);
+}
+.package input:focus-visible + .package__card {
+    outline: var(--focus-width) solid var(--color-focus);
+    outline-offset: var(--focus-offset);
+}
+/* Côte à côte, une description sur 2 lignes décalait le prix de sa carte :
+   on réserve 2 lignes à chaque description pour aligner les prix des 3 cartes. */
+@media (min-width: 768px) {
+    .package__desc { min-height: calc(var(--line-height-body-2) * 2); }
+}
+/* Entre 768 et 1023px, les cartes sont étroites : « 420,00 € / an ou 38,50 € / mois » tient
+   sur 2 lignes avant le choix du rythme, sur 1 après. On réserve 2 lignes pour que les cartes
+   ne rétrécissent pas au clic. À partir de 1024px, le prix tient toujours sur une ligne. */
+@media (min-width: 768px) and (max-width: 1023px) {
+    .package__price { min-height: calc(var(--line-height-body-1) * 2); }
+}
+.package__name {
+    font-size: var(--font-size-headline-3); line-height: var(--line-height-headline-3);
+    font-weight: var(--font-weight-medium);
+}
+.package__price { font-size: var(--font-size-body-1); font-weight: var(--font-weight-bold); }
+/* Chiffres à chasse fixe : les montants qui changent (switch annuel/mensuel, total) ne bougent pas en largeur. */
+.package__price, .option__price, .total__amount, .hero__price, .summary__row dd { font-variant-numeric: tabular-nums; }
+.package__includes { display: flex; flex-direction: column; gap: var(--space-1); }
+.package__includes li {
+    font-size: var(--font-size-body-2); line-height: var(--line-height-body-2);
+    color: var(--color-text-muted);
+}
+
+.options { display: flex; flex-direction: column; }
+/* Prix aligné sur la ligne du nom de l'option (baseline), pas centré entre nom et description. */
+.option {
+    display: flex; align-items: baseline; justify-content: space-between; gap: var(--space-3);
+    min-height: var(--control-height);
+    padding-block: var(--space-3);
+    border-bottom: var(--border-width-1) solid var(--color-border);
+}
+.option .check { flex: 1; }
+.option__price { white-space: nowrap; font-weight: var(--font-weight-medium); }
+/* Téléphone : le prix (jusqu'à « 48,00 € / an ou 4,40 € / mois ») ne tient pas à côté du nom,
+   il écrasait la description et débordait de l'écran. Il passe dessous, aligné sur le nom. */
+@media (max-width: 767px) {
+    .option { flex-direction: column; align-items: stretch; gap: var(--space-2); }
+    .option__price { padding-inline-start: calc(var(--icon-size) + var(--space-3)); }
+}
+.option.is-included .option__price { color: var(--color-text-muted); font-weight: var(--font-weight-regular); }
+
+.total { display: flex; flex-direction: column; flex: 1; }
+.total__amount {
+    font-size: var(--font-size-headline-3); line-height: var(--line-height-headline-3);
+    font-weight: var(--font-weight-bold);
+}
+
+/* Squelettes : même taille que le contenu final, rien ne saute à la réponse. */
+.skeleton {
+    background: var(--color-surface);
+    border-radius: var(--radius-1);
+    animation: pulse var(--duration-3) ease-in-out infinite;
+}
+.skeleton--card { min-height: calc(var(--control-height) * 4); }
+@keyframes pulse { 50% { opacity: var(--opacity-disabled); } }
+
+/* ---------- Récapitulatif ---------- */
+
+.summary { display: grid; gap: var(--space-3); }
+/* Colonne large : les réponses sur 2 colonnes, chaque libellé reste près de sa valeur. */
+@media (min-width: 768px) {
+    .summary { grid-template-columns: 1fr 1fr; column-gap: var(--space-7); }
+}
+.summary__row { display: flex; justify-content: space-between; gap: var(--space-4); }
+/* Le libellé prend la place restante, la valeur garde sa largeur naturelle (60 % max) :
+   sur téléphone, « Garage fermé » ne se coupait plus en deux à côté d'un long libellé. */
+.summary__row dt { flex: 1 1 0; color: var(--color-text-muted); }
+.summary__row dd { flex: 0 1 auto; max-width: 60%; }
+/* Pas de « ? » seul en dernière ligne (balance, lui, coupait « stationne-t-elle » au trait d'union). */
+.summary__row dt, .summary__row dd { text-wrap: pretty; }
+/* Titre + « Modifier » : le lien fait 52px de haut (cible tactile) et le titre 32px.
+   Alignés sur la ligne de base, les deux textes sont sur la même ligne. */
+.summary__head { align-items: baseline; }
+.summary__row dd { text-align: end; font-weight: var(--font-weight-medium); }
+
+.doc-list { display: flex; flex-direction: column; gap: var(--space-2); }
+.doc-list a { color: var(--color-text); text-underline-offset: var(--space-1); }
+
+/* ---------- Référence de paiement ---------- */
+
+.reference { display: flex; flex-direction: column; gap: var(--space-4); }
+/* Boutons du panneau : l'un sous l'autre, pleine largeur, mêmes bords que les lignes au-dessus. */
+.reference__actions { display: grid; gap: var(--space-3); }
+.reference__actions .btn { width: 100%; }
+
+.payment-help { display: flex; flex-direction: column; gap: var(--space-5); }
+.payment-help__policy {
+    padding-block-start: var(--space-5);
+    border-top: var(--border-width-1) solid var(--color-border);
+}
+
+/* Colonne large : la référence à gauche, « Comment payer » et le contrat à droite. */
+@media (min-width: 768px) {
+    .payment-layout {
+        display: grid; grid-template-columns: 1fr 1fr; align-items: start;
+        column-gap: var(--space-7);
+    }
+    /* « Comment payer » commence à la hauteur de « Pour payer », qui est dans un panneau. */
+    .payment-help { padding-block-start: var(--space-5); }
+}
+.reference__item {
+    display: flex; align-items: center; justify-content: space-between; gap: var(--space-3);
+    padding-block: var(--space-3);
+    border-bottom: var(--border-width-1) solid var(--color-border);
+}
+.reference__value {
+    font-size: var(--font-size-headline-3); line-height: var(--line-height-headline-3);
+    font-weight: var(--font-weight-bold);
+    font-variant-numeric: tabular-nums;
+}
+.reference__item .btn { min-width: 0; padding-inline: var(--space-4); }
+
+/* Bouton Copier : « Copier » et « Copié » dans la même case de grille, un seul visible.
+   Le bouton prend la largeur du plus long des deux : il ne change pas de taille au clic. */
+.copy__idle, .copy__done { grid-area: 1 / 1; }
+.copy { display: inline-grid; place-items: center; }
+.copy__done, .copy.is-done .copy__idle { visibility: hidden; }
+.copy.is-done .copy__done { visibility: visible; }
+/* Réussite en couleur de texte normale ; l'échec garde la couleur d'erreur de .field__error. */
+.copy-status.is-ok { color: var(--color-text); }
+
+/* Étapes sur 2 lignes chacune : 24px entre deux étapes (contre 12px), sinon elles se lisent
+   comme un seul paragraphe ; 16px entre le numéro et le texte. */
+.steps { display: flex; flex-direction: column; gap: var(--space-5); counter-reset: step; list-style: none; }
+.steps li { display: flex; gap: var(--space-4); counter-increment: step; }
+.steps li::before {
+    content: counter(step);
+    flex: none;
+    display: inline-flex; align-items: center; justify-content: center;
+    width: calc(var(--space-5) + var(--space-1)); height: calc(var(--space-5) + var(--space-1));
+    border-radius: var(--radius-round);
+    background: var(--color-accent); color: var(--color-on-accent);
+    font-size: var(--font-size-label-1); font-weight: var(--font-weight-bold);
+}
+
+@media print {
+    .topbar, .actionbar, .no-print { display: none; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+    *, *::before, *::after { animation-duration: 0.01ms !important; transition-duration: 0.01ms !important; }
+}

@@ -1,0 +1,7 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 124 32" aria-hidden="true" focusable="false">
+  <!-- Monogramme : un V dont la branche droite monte plus haut, comme une coche (« couvert »). -->
+  <path class="logo__mark" d="M2 6H8.5L16 21V29Z"/>
+  <path class="logo__accent" d="M23.5 2H30L16 29V21Z"/>
+  <!-- Nom : texte dans la police du flow ; textLength fige sa largeur quelle que soit la police. -->
+  <text class="logo__wordmark" x="40" y="25" font-size="24" textLength="84" lengthAdjust="spacingAndGlyphs">VYRA</text>
+</svg>
