@@ -1,0 +1,15 @@
+{
+  "name": "beloy-enrollment-flow",
+  "private": true,
+  "type": "module",
+  "description": "Parcours de souscription d'assurance BMW électrique. L'app n'a aucune dépendance : ce fichier ne sert qu'aux tests.",
+  "scripts": {
+    "start": "npx serve .",
+    "test": "node --test \"tests/unit/*.test.js\"",
+    "test:e2e": "node --test --test-concurrency=1 \"tests/e2e/*.test.js\"",
+    "test:all": "npm test && npm run test:e2e"
+  },
+  "devDependencies": {
+    "puppeteer-core": "^23.11.1"
+  }
+}
