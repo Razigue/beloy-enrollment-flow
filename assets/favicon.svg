@@ -1,0 +1,11 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 32 32">
+  <!-- Le V du logo seul. Exception à la règle 1 : le navigateur affiche la favicon hors de la page,
+       elle ne peut pas lire les tokens. Valeurs recopiées de tokens.css (couleurs du texte et d’accent). -->
+  <style>
+    .mark { fill: #262626; }
+    .accent { fill: #1c69d4; }
+    @media (prefers-color-scheme: dark) { .mark { fill: #e6e6e6; } }
+  </style>
+  <path class="mark" d="M2 6H8.5L16 21V29Z"/>
+  <path class="accent" d="M23.5 2H30L16 29V21Z"/>
+</svg>
