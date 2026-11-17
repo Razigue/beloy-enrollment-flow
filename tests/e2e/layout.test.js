@@ -113,19 +113,24 @@ describe("règle 7 : rien ne saute", () => {
         assert.deepEqual(after, during);
     });
 
-    // Bug connu, trouvé par ce test : squelette 208px (4 × --control-height), vraie carte 292px sur desktop,
-    // et le squelette n'a pas le choix du rythme au-dessus des cartes. Marqué « todo » : visible, non bloquant.
-    test("le squelette a la taille des vraies cartes", { todo: "squelette 208px contre 292px : à corriger dans base.css" }, async () => {
-        const page = await openFlow(browser, baseUrl, { viewport: DESKTOP });
-        await clickContinue(page);
-        await passVehicle(page);
-        await passDriver(page);
-        const skeleton = await box(page, ".skeleton--card");
-        await waitForQuote(page);
-        const card = await box(page, ".package");
-        assert.ok(Math.abs(skeleton.height - card.height) <= 2, `${skeleton.height} vs ${card.height}`);
-        assert.ok(Math.abs(skeleton.width - card.width) <= 2, `${skeleton.width} vs ${card.width}`);
-    });
+    // Ce test a trouvé un bug : squelette de 208px contre 292px pour une carte, sans le choix du rythme
+    // au-dessus. Corrigé en construisant le squelette comme l'écran final.
+    for (const [label, viewport] of [["desktop", DESKTOP], ["mobile", PHONE]]) {
+        test(`${label} : à l'arrivée du devis, les cartes ne bougent pas et gardent leur taille`, async () => {
+            const page = await openFlow(browser, baseUrl, { viewport });
+            await clickContinue(page);
+            await passVehicle(page);
+            await passDriver(page);
+            const skeleton = await box(page, ".skeleton--card");
+            const rhythm = await box(page, "fieldset");
+            await waitForQuote(page);
+            const card = await box(page, ".package");
+            assert.deepEqual(await box(page, "fieldset"), rhythm, "choix du rythme");
+            assert.equal(card.top, skeleton.top, "position de la 1re carte");
+            assert.ok(Math.abs(skeleton.height - card.height) <= 2, `hauteur ${skeleton.height} vs ${card.height}`);
+            assert.equal(card.width, skeleton.width, "largeur");
+        });
+    }
 
     test("desktop : les prix des 3 cartes sont alignés", async () => {
         const page = await openFlow(browser, baseUrl, { viewport: DESKTOP });

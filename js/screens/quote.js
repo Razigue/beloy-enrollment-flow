@@ -31,7 +31,7 @@ function priceText(price) {
 export function renderQuote() {
     document.title = t("flow.quote.page_title");
 
-    const content = h("div", { class: "form", "aria-busy": "true" }, skeleton());
+    const content = h("div", { class: "form", "aria-busy": "true" }, ...skeleton());
     const totalAmount = h("p", { class: "total__amount" }, "—");
     const totalHint = h("p", { class: "field__hint" }, t("flow.quote.total.empty"));
     const continueButton = primaryButton(t("flow.nav.continue"), { disabled: true, onClick: next });
@@ -172,7 +172,7 @@ export function renderQuote() {
 
     async function load() {
         content.setAttribute("aria-busy", "true");
-        content.replaceChildren(skeleton());
+        content.replaceChildren(...skeleton());
         try {
             const quote = await createQuote({ program: "bmw-fr-ev", vehicle: state.vehicle, driver: state.driver });
             // Le client a quitté l'écran pendant l'appel (et a peut-être changé ses réponses) :
@@ -195,12 +195,42 @@ export function renderQuote() {
     return view;
 }
 
-// Squelette de la même taille que les cartes : rien ne saute quand le devis arrive (règle 7).
+// Une ligne de texte fantôme : l'enveloppe garde la classe du vrai texte (même hauteur de ligne),
+// la barre grise à l'intérieur remplace les mots.
+const bar = (cls, width = "") => h("span", { class: cls }, h("span", { class: `skeleton skeleton--bar ${width}` }, " "));
+
+// Squelette construit comme l'écran final (règle 7) : rien ne saute quand le devis arrive.
+// - le choix du rythme ne dépend pas de l'API : c'est le vrai, désactivé pendant l'appel ;
+// - les cartes fantômes ont les classes des vraies (padding, titre, description, prix) et
+//   4 lignes d'inclus, le maximum d'une formule, qui fixe la hauteur des cartes côte à côte ;
+// - « Chargement » n'est annoncé qu'aux lecteurs d'écran : visible, il décalait les cartes.
 function skeleton() {
-    return h(
+    const frequency = choices({
+        legend: t("flow.quote.frequency.label"),
+        name: "frequency",
+        value: state.selection.frequency,
+        options: ["annual", "monthly"].map((v) => ({ value: v, label: t(`flow.quote.frequency.${v}`) })),
+        onChange: () => {},
+        withError: false,
+    });
+    frequency.disabled = true;
+
+    const ghostCard = () => h(
         "div",
-        { class: "form" },
-        h("p", { class: "field__hint" }, t("flow.quote.loading")),
-        h("div", { class: "packages" }, [1, 2, 3].map(() => h("div", { class: "skeleton skeleton--card" }))),
+        { class: "package skeleton--card", "aria-hidden": "true" },
+        h(
+            "span",
+            { class: "package__card" },
+            bar("package__name", "skeleton--short"),
+            bar("field__hint package__desc", "skeleton--long"),
+            bar("package__price", "skeleton--short"),
+            h("ul", { class: "package__includes" }, [1, 2, 3, 4].map(() => h("li", { class: "skeleton-card__include" }, bar("", "")))),
+        ),
     );
+
+    return [
+        h("p", { class: "visually-hidden", role: "status" }, t("flow.quote.loading")),
+        frequency,
+        h("div", { class: "packages" }, [1, 2, 3].map(ghostCard)),
+    ];
 }

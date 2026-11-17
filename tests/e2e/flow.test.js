@@ -54,6 +54,26 @@ describe("parcours complet", () => {
         assert.equal(await page.$eval("#app select", (el) => el.value), "i4");
         assert.match(await text(page), /59\s590,00\s€/);
     });
+
+    test("changer de modèle met à jour le prix affiché", async () => {
+        const page = await openFlow(browser, baseUrl);
+        await clickContinue(page);
+        await fill(page, "#app select", "i7");
+        const price = await page.$eval(".order-total__amount", (el) => el.textContent.replace(/[  ]/g, " "));
+        assert.equal(price, "119 900,00 €");
+    });
+
+    test("changer de modèle après un devis efface le devis et la sélection", async () => {
+        const page = await toQuote();
+        await choose(page, { pkg: "comfort", frequency: "annual" });
+        await page.click(".topbar__back");
+        await page.click(".topbar__back");
+        await fill(page, "#app select", "iX1");
+        await clickContinue(page);
+        await clickContinue(page);
+        await waitForQuote(page);
+        assert.equal(await total(page), "—");
+    });
 });
 
 describe("écran Formules", () => {
@@ -195,12 +215,16 @@ describe("référence de paiement", () => {
         const page = await toPayment();
         const values = await page.$$eval(".reference__value", (els) => els.map((e) => e.textContent.replace(/[  ]/g, " ")));
         assert.deepEqual(values, ["21456", "907 318 442", "74,80 €"]);
+        const labels = await page.$$eval(".reference__item .label", (els) => els.map((e) => e.textContent));
+        assert.equal(labels[2], "Première mensualité");
     });
 
     test("en annuel, le montant est celui de l'année", async () => {
         const page = await toPayment("annual");
         const values = await page.$$eval(".reference__value", (els) => els.map((e) => e.textContent.replace(/[  ]/g, " ")));
         assert.equal(values[2], "816,00 €");
+        const labels = await page.$$eval(".reference__item .label", (els) => els.map((e) => e.textContent));
+        assert.equal(labels[2], "Montant de l'année");
     });
 
     test("échéance, numéro de contrat et marche à suivre sont affichés", async () => {
@@ -232,7 +256,7 @@ describe("référence de paiement", () => {
         await page.bringToFront();
         await page.click(".reference__actions .btn--primary");
         const copied = (await page.evaluate(() => navigator.clipboard.readText())).replace(/[  ]/g, " ");
-        for (const part of ["21456", "907 318 442", "74,80 €", "1er juin 2027"]) assert.ok(copied.includes(part), part);
+        for (const part of ["21456", "907 318 442", "Première mensualité : 74,80 €", "1er juin 2027"]) assert.ok(copied.includes(part), part);
     });
 
     test("le bouton change de libellé sans changer de largeur (règle 7)", async () => {
