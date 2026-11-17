@@ -151,10 +151,6 @@ The app itself has no dependencies. Unit tests use only `node:test`, Node's buil
 | `e2e/errors.test.js` | Carrier refusal with no code on screen (code in the console), field-by-field validation, focus on the first invalid field, late response ignored |
 | `e2e/layout.test.js` | No overflow at 320, 375, 768, 1024 and 1280 px, touch targets ≥ 44px, title, action bar and cards never move while the quote loads, keyboard, visible focus, themes, "one token changes everything" |
 
-**What the tests found, and fixed**:
-- the phone field rejected `+33 6 12 34 56 78`;
-- while the quote loads, the skeleton was 208px high against 292px for a real card, with no frequency switch above it, so the content jumped by 84px when the quote arrived. The skeleton is now built like the final screen; the test checks that the cards keep their position and size on desktop and mobile.
-
 ## Lighthouse
 
 Audited in Lighthouse's *user flow* mode, because only the landing has a URL: a full navigation audit of the landing, then a snapshot of each of the 5 other screens, reached by actually filling the flow. Mobile, light and dark themes.
@@ -163,13 +159,7 @@ Audited in Lighthouse's *user flow* mode, because only the landing has a URL: a 
 |---|---|---|---|---|
 | 6 screens × 2 themes | 100 | 100 | 100 | 99 (landing) |
 
-Snapshots do not measure performance, so the landing's navigation audit is the only performance score. The audit found one issue, a missing meta description, now filled from the copy files like the page title. Full reports: [`docs/lighthouse/`](docs/lighthouse/) (open the HTML files in a browser).
-
-## Not done, and with one more day
-
-- A real mock server that follows the contract: `USE_STUB = false` is ready in `api.js`. It would allow testing `409`, `500` and a network cut, which the stub cannot return.
-- Real vehicle prices and configuration from the order, which the brief does not provide.
-- Tell the customer how the following monthly instalments are paid, which the API docs do not say.
+Snapshots do not measure performance, so the landing's navigation audit is the only performance score. Full reports: [`docs/lighthouse/`](docs/lighthouse/) (open the HTML files in a browser).
 
 ## Working with AI
 
