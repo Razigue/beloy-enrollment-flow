@@ -110,11 +110,10 @@ The house rules and where they live:
 
 ### Rebranding in 20 minutes
 
-1. `styles/tokens.css`: colours, radius, shadows, typeface. The flow and the logo follow.
-2. `index.html`: the Google Fonts link for the new typeface.
-3. `assets/favicon.svg`: two colours to copy by hand. This is the only exception to rule 1, because a favicon is drawn outside the page and cannot read the tokens. A test checks that it stays in sync.
-4. `i18n/*.json`: `flow.brand.name` and the strings that mention BMW.
-5. `npm test`: checks that the new contrasts still pass AA.
+1. `styles/tokens.css`: colours, radius, shadows, and the typeface with its Google Fonts import on the first line. The flow and the logo follow.
+2. `assets/favicon.svg`: two colours to copy by hand. This is the only exception to rule 1, because a favicon is drawn outside the page and cannot read the tokens. A test checks that it stays in sync.
+3. `i18n/*.json`: `flow.brand.name` and the strings that mention BMW.
+4. `npm test`: checks that the new contrasts still pass AA.
 
 ## Accuracy: the total and the API
 
