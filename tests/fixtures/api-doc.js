@@ -1,4 +1,4 @@
-// Exemples recopiés tels quels de docs/Beloy - Ardenne Assurance, API documentation.pdf.
+// Exemples recopiés tels quels de la documentation API Ardenne (fournie avec le brief).
 // Ils servent de référence : les stubs et l'état du wizard doivent leur correspondre.
 
 const option = (code, included, annual, monthly) => ({ code, included, price: { annual, monthly } });

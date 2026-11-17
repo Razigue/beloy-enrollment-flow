@@ -163,4 +163,4 @@ Snapshots do not measure performance, so the landing's navigation audit is the o
 
 ## Working with AI
 
-[`NOTES.md`](NOTES.md) (in French) logs every decision with the option rejected, what the AI wrote, and what I had to correct or refuse. It was the basis of the submission PDF, [`rendu.pdf`](rendu.pdf). The brief and the API documentation are in [`docs/`](docs/).
+[`NOTES.md`](NOTES.md) (in French) logs every decision with the option rejected, what the AI wrote, and what I had to correct or refuse. It was the basis of the submission PDF, [`rendu.pdf`](rendu.pdf).

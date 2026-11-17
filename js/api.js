@@ -1,5 +1,5 @@
 // Client de l'API Ardenne Assurance.
-// USE_STUB = true : réponses tirées des exemples de la doc (docs/), avec un délai simulé.
+// USE_STUB = true : réponses tirées des exemples de la documentation API Ardenne, avec un délai simulé.
 // USE_STUB = false : vrais appels HTTP vers BASE_URL (mock serveur).
 const BASE_URL = "http://127.0.0.1:4000";
 const USE_STUB = true;
