@@ -1,4 +1,4 @@
-import { loadLocale } from "./i18n.js";
+import { loadLocale, t } from "./i18n.js";
 import { loadLogo } from "./layout.js";
 import { state, STEPS, subscribe } from "./state.js";
 import { renderCover } from "./screens/cover.js";
@@ -41,6 +41,8 @@ async function start() {
             "Le service est momentanément indisponible. Veuillez réessayer plus tard.";
         return;
     }
+    // Description de la page (moteurs de recherche, aperçus de lien) : texte de la copy, comme le titre.
+    document.querySelector('meta[name="description"]').content = t("flow.meta.description");
     subscribe(render);
     render();
 }
