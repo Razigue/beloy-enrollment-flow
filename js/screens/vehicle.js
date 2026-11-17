@@ -5,17 +5,30 @@ import { state, next, resetQuote } from "../state.js";
 import { screen, primaryButton } from "../layout.js";
 import { field, validate, isoDate } from "../form.js";
 
-const MODELS = ["i4", "i5", "i7", "iX1", "iX2", "iX3"];
+// Prix de catalogue par modèle, en centimes comme l'API (list_price).
+// Le brief ne fournit aucune commande : i4 reprend l'exemple de la doc, les autres sont fictifs
+// mais plausibles. Ce sont des données (envoyées à l'API), pas des textes : pas dans la copy.
+export const MODEL_PRICES = {
+    i4: 5959000,
+    i5: 7490000,
+    i7: 11990000,
+    iX1: 4895000,
+    iX2: 5145000,
+    iX3: 6890000,
+};
 
 // Prix de la configuration en pied de panneau, comme le Total de l'écran Formules :
 // libellé discret à gauche, montant en gras à droite, séparés du formulaire par un filet.
+// Le montant est renvoyé à part pour être mis à jour quand le modèle change.
 function priceRow() {
-    return h(
+    const amount = h("span", { class: "order-total__amount" }, formatPrice(state.vehicle.list_price));
+    const row = h(
         "p",
         { class: "order-total" },
         h("span", { class: "text-muted" }, t("flow.vehicle.list_price.label")),
-        h("span", { class: "order-total__amount" }, formatPrice(state.vehicle.list_price)),
+        amount,
     );
+    return { row, amount };
 }
 
 export function renderVehicle() {
@@ -24,10 +37,21 @@ export function renderVehicle() {
     const tomorrow = new Date();
     tomorrow.setDate(tomorrow.getDate() + 1);
 
+    const price = priceRow();
+
+    // Changer de modèle change le prix envoyé à l'API, donc le devis : on l'efface (resetQuote).
     const model = h(
         "select",
-        { required: true, onChange: (e) => { state.vehicle.model_code = e.target.value; resetQuote(); } },
-        MODELS.map((code) =>
+        {
+            required: true,
+            onChange: (e) => {
+                state.vehicle.model_code = e.target.value;
+                state.vehicle.list_price = MODEL_PRICES[e.target.value];
+                price.amount.textContent = formatPrice(state.vehicle.list_price);
+                resetQuote();
+            },
+        },
+        Object.keys(MODEL_PRICES).map((code) =>
             h("option", { value: code, selected: code === state.vehicle.model_code }, t(`flow.vehicle.models.${code}`)),
         ),
     );
@@ -60,7 +84,7 @@ export function renderVehicle() {
                     control: delivery,
                     errors: { rangeUnderflow: "flow.error.field.delivery_past" },
                 })),
-            priceRow(),
+            price.row,
         ),
     );
 
