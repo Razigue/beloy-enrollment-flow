@@ -67,9 +67,13 @@ export function renderPayment() {
     }
 
     const amount = formatPrice(payment.amount, currency);
+    // Doc API : en mensuel, `amount` est la première mensualité, pas l'année. Le libellé le dit,
+    // d'après le rythme renvoyé par le contrat (premium.frequency), pas celui de l'écran.
+    const amountKey = `flow.payment.amount.${state.contract.premium.frequency}`;
     const allText = t("flow.payment.copy_all_text", {
         entity: payment.entity,
         reference: group(payment.reference),
+        amount_label: t(amountKey),
         amount,
         due: formatDate(payment.due_by),
         policy: policy_number,
@@ -84,7 +88,7 @@ export function renderPayment() {
             h("h2", { class: "panel__title", id: "ref-title" }, t("flow.payment.reference.title")),
             item("flow.payment.entity", payment.entity, payment.entity),
             item("flow.payment.reference", group(payment.reference), payment.reference),
-            item("flow.payment.amount", amount, amount),
+            item(amountKey, amount, amount),
             h("p", {}, t("flow.payment.due", { date: formatDate(payment.due_by) })),
             h(
                 "div",
